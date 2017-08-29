@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>{{pc.name}} - Character Sheet</title>
+    <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+    <div class="details">
+        {% for choice,traits in pc.traits.items() %}
+            <div class="choice">
+                <h3>{{ choice }}</h3>
+                <div class="traits">
+                    {% for title,description in traits.items() %}
+                    <div>
+                        <h4>{{title}}</h4>
+                        <p>{{description}}</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</body>
+</html>

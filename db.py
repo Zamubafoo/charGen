@@ -86,100 +86,172 @@ db.query("""create table pc_choice (
          )""")
 
 with open('source.json') as f:
-    sources=json.load(f)
+    sources = json.load(f)
 
-for _,d in sources.items():
-    db.query('insert into source (fulltitle, abbreviation, collection) values (:name,:abbreviation,:collection)',
-             name=d['name'],abbreviation=d['abbreviation'],collection=d['group'])
+for _, d in sources.items():
+    db.query(
+        'insert into source (fulltitle, abbreviation, collection) values (:name,:abbreviation,:collection)',
+        name=d['name'],
+        abbreviation=d['abbreviation'],
+        collection=d['group'])
 
 db.query('insert into selection (title) values ("Race")')
 with open('race.json') as f:
-    races=json.load(f)
+    races = json.load(f)
 
-selection_id=db.query('select id from selection where title="Race";')[0]['id']
+selection_id = db.query(
+    'select id from selection where title="Race";')[0]['id']
 for race in races['race']:
-    source_id=db.query('select id from source where fulltitle like :source',
-                       source="%"+race['source'])[0]['id']
-    db.query('insert into choice (title, source_id, selection_id) values (:name,:source_id,:selection_id)',
-             name=race['name'],source_id=source_id,selection_id=selection_id)
-    choice_id=db.query('select id from choice where title=:name',name=race['name'])[0]['id']
-    db.query('insert into trait (title,description,level_acquired,choice_id) values ("Speed",:speed, 0, :choice_id)',
-             speed=race['speed'],choice_id=choice_id)
-    db.query('insert into trait (title,description,level_acquired,choice_id) values ("Size",:size, 0, :choice_id)',
-             size=race['size'],choice_id=choice_id)
-    db.query('insert into trait (title, description, level_acquired, choice_id) values ("Ability",:ability, 0, :choice_id)',
-             ability=race['ability'], choice_id=choice_id)
+    source_id = db.query('select id from source where fulltitle like :source',
+                         source="%" + race['source'])[0]['id']
+    db.query(
+        'insert into choice (title, source_id, selection_id) values (:name,:source_id,:selection_id)',
+        name=race['name'],
+        source_id=source_id,
+        selection_id=selection_id)
+    choice_id = db.query(
+        'select id from choice where title=:name',
+        name=race['name'])[0]['id']
+    db.query(
+        'insert into trait (title,description,level_acquired,choice_id) values ("Speed",:speed, 0, :choice_id)',
+        speed=race['speed'],
+        choice_id=choice_id)
+    db.query(
+        'insert into trait (title,description,level_acquired,choice_id) values ("Size",:size, 0, :choice_id)',
+        size=race['size'],
+        choice_id=choice_id)
+    db.query(
+        'insert into trait (title, description, level_acquired, choice_id) values ("Ability",:ability, 0, :choice_id)',
+        ability=race['ability'],
+        choice_id=choice_id)
     for trait in race['trait']:
-        db.query('insert into trait (title, description, level_acquired, choice_id) values (:name, :text, 0, :choice_id)',
-                name=trait['name'], text='\n'.join(t for t in trait['text'] if t), choice_id=choice_id)
+        db.query(
+            'insert into trait (title, description, level_acquired, choice_id) values (:name, :text, 0, :choice_id)',
+            name=trait['name'],
+            text='\n'.join(
+                t for t in trait['text'] if t),
+            choice_id=choice_id)
 
 db.query('insert into selection (title) values ("Background")')
 with open('background.json') as f:
-    backgrounds=json.load(f)
+    backgrounds = json.load(f)
 
-selection_id = db.query('select id from selection where title="Background";')[0]['id']
+selection_id = db.query(
+    'select id from selection where title="Background";')[0]['id']
 for background in backgrounds['background']:
-    source_id=db.query('select id from source where fulltitle like :source',
-                      source="%"+race['source'])[0]['id']
-    db.query('insert into choice (title, source_id, selection_id) values (:name, :source_id, :selection_id)',
-            name=background['name'],source_id=source_id,selection_id=selection_id)
-    choice=db.query('select * from choice where title=:name', name=background['name'])
+    source_id = db.query('select id from source where fulltitle like :source',
+                         source="%" + race['source'])[0]['id']
+    db.query(
+        'insert into choice (title, source_id, selection_id) values (:name, :source_id, :selection_id)',
+        name=background['name'],
+        source_id=source_id,
+        selection_id=selection_id)
+    choice = db.query(
+        'select * from choice where title=:name',
+        name=background['name'])
     for trait in background['trait']:
-        db.query('insert into trait (title, description, level_acquired, choice_id) values'\
-                 '(:name, :text, 0, :choice_id)',
-                name=trait['name'], text='\n'.join(t for t in trait['text'] if t), choice_id=choice[0]['id'])
+        db.query(
+            'insert into trait (title, description, level_acquired, choice_id) values'
+            '(:name, :text, 0, :choice_id)',
+            name=trait['name'],
+            text='\n'.join(
+                t for t in trait['text'] if t),
+            choice_id=choice[0]['id'])
 
 db.query('insert into selection (title) values ("Class")')
 with open('class.json') as f:
-    classes=json.load(f)
+    classes = json.load(f)
 
 for cclass in classes['class']:
-    selection_id=db.query('select id from selection where title="Class"')[0]['id']
-    source_id=db.query('select id from source where fulltitle like :source', source="%"+cclass['source'])[0]['id']
-    db.query('insert into choice (title, source_id, selection_id) values (:name, :source, :selection)',name=cclass['name'],source=source_id,selection=selection_id)
-    choice_id=db.query('select id from choice where title=:name', name=cclass['name'])[0]['id']
+    selection_id = db.query(
+        'select id from selection where title="Class"')[0]['id']
+    source_id = db.query(
+        'select id from source where fulltitle like :source',
+        source="%" + cclass['source'])[0]['id']
+    db.query(
+        'insert into choice (title, source_id, selection_id) values (:name, :source, :selection)',
+        name=cclass['name'],
+        source=source_id,
+        selection=selection_id)
+    choice_id = db.query(
+        'select id from choice where title=:name',
+        name=cclass['name'])[0]['id']
     for level in cclass['autolevel']:
         if 'feature' in level:
             for feature in level['feature']:
                 if 'subclass' not in feature:
-                    db.query('insert into trait (title, description, level_acquired, choice_id) values (:name, :text, :level, :choice_id)',name=feature['name'], text='\n'.join(t for t in feature['text'] if t),level=level['_level'],choice_id=choice_id)
+                    db.query(
+                        'insert into trait (title, description, level_acquired, choice_id) values (:name, :text, :level, :choice_id)',
+                        name=feature['name'],
+                        text='\n'.join(
+                            t for t in feature['text'] if t),
+                        level=level['_level'],
+                        choice_id=choice_id)
                 elif 'issubclass' in feature:
-                    subselection=[r for r in db.query('select * from selection where title=:parent',parent=feature['parent'])]
+                    subselection = [
+                        r for r in db.query(
+                            'select * from selection where title=:parent',
+                            parent=feature['parent'])]
                     if not subselection:
-                        db.query('insert into selection (title) values (:parent)', parent=feature['parent'])
-                        subselection=db.query('select * from selection where title=:parent',parent=feature['parent'])
-                    db.query('insert into choice (title,selection_id) values (:feature,:subselection)', feature=feature['name'], subselection=subselection[0]['id'])
-                    db.query('insert into trait (title, description, level_acquired, choice_id) values (:name, :text, :level, :subselection)', name=feature['name'],text='\n'.join(t for t in feature['text'] if t), level=level['_level'],subselection=subselection[0]['id'])
+                        db.query(
+                            'insert into selection (title) values (:parent)',
+                            parent=feature['parent'])
+                        subselection = db.query(
+                            'select * from selection where title=:parent',
+                            parent=feature['parent'])
+                    db.query(
+                        'insert into choice (title,selection_id) values (:feature,:subselection)',
+                        feature=feature['name'],
+                        subselection=subselection[0]['id'])
+                    db.query(
+                        'insert into trait (title, description, level_acquired, choice_id) values (:name, :text, :level, :subselection)',
+                        name=feature['name'],
+                        text='\n'.join(
+                            t for t in feature['text'] if t),
+                        level=level['_level'],
+                        subselection=subselection[0]['id'])
                 else:
                     try:
-                        subchoice = [r for r in db.query('select * from choice where title=:parent', parent=feature['subclass'])]
-                        db.query('insert into trait (title, description, level_acquired, choice_id) values (:name, :text, :level, :subchoice)', name=feature['name'],text='\n'.join(t for t in feature['text'] if t), level=level['_level'], subchoice=subchoice[0]['id'])
-                    except:
-                        print('##',feature['name'])
+                        subchoice = [
+                            r for r in db.query(
+                                'select * from choice where title=:parent',
+                                parent=feature['subclass'])]
+                        db.query(
+                            'insert into trait (title, description, level_acquired, choice_id) values (:name, :text, :level, :subchoice)',
+                            name=feature['name'],
+                            text='\n'.join(
+                                t for t in feature['text'] if t),
+                            level=level['_level'],
+                            subchoice=subchoice[0]['id'])
+                    except BaseException:
+                        print('##', feature['name'], feature['parent'])
+
 
 class PC:
     def __init__(self):
         self.choices = dict()
         self.traits = dict()
         self.passedselections = list()
-        self.characterlevel = lambda : sum(self.classlevels.values())
+        self.characterlevel = lambda: sum(
+            len(v) for k, v in self.classlevels.items())
         self.classlevels = {
-             'Artificer (UA)': 0,
-             'Barbarian': 0,
-             'Bard': 0,
-             'Cleric': 0,
-             'Druid': 0,
-             'Fighter': 0,
-             'Monk': 0,
-             'Mystic (UA)': 0,
-             'Paladin': 0,
-             'Ranger': 0,
-             'Ranger (Revised)': 0,
-             'Rogue': 0,
-             'Sorcerer': 0,
-             'Warlock': 0,
-             'Wizard': 0
+            'Artificer (UA)': [],
+            'Barbarian': [],
+            'Bard': [],
+            'Cleric': [],
+            'Druid': [],
+            'Fighter': [],
+            'Monk': [],
+            'Mystic (UA)': [],
+            'Paladin': [],
+            'Ranger': [],
+            'Ranger (Revised)': [],
+            'Rogue': [],
+            'Sorcerer': [],
+            'Warlock': [],
+            'Wizard': []
         }
+
 
 def multiclassFilter(choices, pc):
     remaining = [cl['title'] for cl in choices]
@@ -210,15 +282,16 @@ def multiclassFilter(choices, pc):
                 remaining.remove('Wizard')
                 remaining.remove('Mystic (UA)')
                 remaining.remove('Artificer (UA)')
-        except:
+        except BaseException:
             pass
     return [cl for cl in choices if cl['title'] in remaining]
 
+
 def createCharacter(stats):
-    level=int(input('Character Level: '))
-    q=list('Class' for _ in range(level))
-    q+=['Background','Race',]
-    pc=PC()
+    level = int(input('Character Level: '))
+    q = list('Class' for _ in range(level))
+    q += ['Background', 'Race', ]
+    pc = PC()
     pc.strength = stats[0]
     pc.dexterity = stats[1]
     pc.constitution = stats[2]
@@ -227,50 +300,62 @@ def createCharacter(stats):
     pc.charisma = stats[5]
 
     while q:
-        INPUT=q.pop()
-        try:
-            Choices=list(dict(r) for r in db.query('select * from choice as c join selection as s on c.selection_id=s.id where s.title=:title',
-                           title=INPUT))
-        except:
-            pass
+        INPUT = q.pop()
+        Choices = list(dict(r) for r in db.query(
+            'select * from choice as c join selection as s on'
+            ' c.selection_id=s.id where s.title=:title',
+            title=INPUT))
         if INPUT == 'Class' and pc.characterlevel != 0:
-            Choices=multiclassFilter(Choices, pc)
+            Choices = multiclassFilter(Choices, pc)
         for r in Choices:
-            print(r['id'],'-',r['title'])
+            print(r['id'], '-', r['title'])
         value = None
         while not value:
-            value=int(input(f"{INPUT}: "))
+            value = int(input(f"{INPUT}: "))
             if value not in [r['id'] for r in Choices]:
-                value=None
+                value = None
 
-        choiceTitle=[r['title'] for r in Choices if r['id'] == value][0]
-        pc.choices[value]=choiceTitle
+        choiceTitle = [r['title'] for r in Choices if r['id'] == value][0]
+        pc.choices[value] = choiceTitle
         if INPUT == 'Class':
-            pc.classlevels[choiceTitle]+=1
-            rellevel = pc.classlevels[choiceTitle]
+            pc.classlevels[choiceTitle].append(pc.characterlevel() + 1)
+            rellevel = len(pc.classlevels[choiceTitle])
         else:
             rellevel = pc.characterlevel()
-        traits = db.query('select * from trait where choice_id=:choice_id and level_acquired <:level',choice_id=value, level=rellevel+1)
-        pc.traits[choiceTitle]=dict()
+        traits = db.query(
+            'select * from trait where choice_id=:choice_id and level_acquired <:level',
+            choice_id=value,
+            level=rellevel + 1)
+        pc.traits[choiceTitle] = dict()
         pc.passedselections.append(INPUT)
         for t in traits:
-            if t['title'].startswith('Starting ') and pc.characterlevel!=1:
+            if t['title'].startswith(
+                    'Starting ') and pc.characterlevel != 1 and t['level_acquired'] == 1:
                 continue
-            pc.traits[choiceTitle][t['title']]=t['description']
-            tmpQ=[r for r in db.query('select * from selection where title=:title',title=t['title'])]
+            pc.traits[choiceTitle][t['title']] = t['description']
+            tmpQ = [
+                r for r in db.query(
+                    'select * from selection where title=:title',
+                    title=t['title'])]
             if tmpQ:
                 for r in tmpQ:
                     if r['id'] not in pc.choices and r['title'] not in pc.passedselections:
                         q.append(r['title'])
     return pc
 
-if __name__=="__main__":
+
+if __name__ == "__main__":
     from random import randint
-    d6=lambda:randint(1,6)
-    pc=createCharacter([sum(d6() for i in range(3)) for _ in range(6)])
-    for k,v in pc.traits.items():
-        print(k)
-        for kk,vv in v.items():
-            print(kk)
-            print('\t',vv,'\n')
-        print('\n\n')
+    import jinja2 as j2
+
+    with open('./output.html') as f:
+        template=j2.Template(f.read())
+    
+    def d6(): return randint(1, 6)
+    name = input("Character Name: ")
+    pc = createCharacter([sum(d6() for i in range(3)) for _ in range(6)])
+    pc.name = name
+    print(pc.traits)
+    print(pc.classlevels)
+    with open(f'{pc.name}.html','w') as f:
+        f.write(template.render(pc=pc))
